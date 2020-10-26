@@ -1,0 +1,117 @@
+{% extends "base.html"  %}
+{%block title_content%}Clusters{%endblock%}
+{%block header_content%}
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">Spotify Mini Project</h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/hub">Hub</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/hub/genrewordmap">Genres Wordmap</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" href="/hub/trackcluster">Track Clusters</a>
+                </li>
+                {% if cluster_num != "NA" %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/hub/trackcluster/result">Track Clusters Results</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        <a href="/"><button type="button" class="btn btn-outline-primary" id="connect">Sign out</button></a>
+    </div>
+{%endblock%}
+{% block main_content %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col text-center">
+                <h1>Track Clusters</h1>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-5 mb-3">
+        <div class="row">
+            <div class="col-6">
+                <p class="card-text">
+                    Generate homogeneous clusters of tracks from your saved songs library. The algorithm will process up to <b>1000</b> songs.<br><br>
+                    The number of clusters is chosen by you. The image on the left provides the <b>inertia</b> per number of clusters to help you choose (inertia is a measure of how internally coherent clusters are, thus  the lower the better).<br><br>
+                    The clusters are based on songs' <i>acousticness</i>, <i>danceability</i>, <i>energy</i>, <i>instrumentalness</i>, <i>liveness</i>, <i>loudness</i>, <i>mode</i>, <i>speechiness</i>, <i>tempo</i> and <i>valence</i>. The definition for each can be found <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/">here</a>.<br><br>
+                    <small>
+                        Clusters use the python <a href="https://scikit-learn.org/">scikit-learn library</a>
+                    </small>
+                    <br><br>
+                </p>
+                <form method="POST">
+                    {{ template_form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ template_form.k.label }}
+                        {{ template_form.k(class_="form-control") }}
+                    </div>
+                        {{ template_form.submit(class_="btn btn-primary") }}
+                </form>
+            </div>
+            <div class="col-6">
+                <img src="/{{ display_image_path }}" alt="K_Cluster_Selection" width="600" height="400">
+            </div>
+        </div>
+    </div>
+    <div class="container border-top">
+        <div class="row mt-5">
+            <div class="col d-flex justify-content-center mb-3">
+                <h3>Descriptive statistics on your saved tracks variables</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <table class="table table-striped table-hover py-5">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            {% for column in describe_table_columns %}
+                            <th scope="col">{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, values in describe_table_dic.items() %}
+                        <tr>
+                            <th scope="row">{{ index }}</th>
+                            {% for value in values.values() %}
+                            <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                  </table>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col d-flex justify-content-center mb-3">
+                <h3>Your saved tracks ids, names and variables</h3>
+            </div>
+        </div>
+        <div class="row mb-5">
+            <div class="col d-flex justify-content-center">
+                <table class="table table-striped table-hover py-5">
+                    <thead>
+                        <tr>
+                            {% for column in audio_features_html_columns %}
+                            <th scope="col">{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, values in audio_features_html_format_dic.items() %}
+                        <tr>
+                            {% for value in values.values() %}
+                            <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                  </table>
+            </div>
+        </div>
+    </div>
+{%endblock%}
