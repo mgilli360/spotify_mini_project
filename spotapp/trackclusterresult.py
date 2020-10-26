@@ -1,5 +1,5 @@
 # Created by: Mathieu Gilli
-# Goal: Create routes for genre word map page
+# Goal: Create routes for showing clusters results
 
 # Relevant modules/packages from package
 from spotapp import app
