@@ -11,7 +11,10 @@ class SpotifyUser:
     # Spotify attributes that are constant for every user
     client_id = os.environ.get("SPOTIFY_CLIENT_ID")
     response_type = "code"
-    redirect_uri = "http%3A%2F%2F127.0.0.1%3A5000%2Fhub" #Hint: https://www.urlencoder.org/
+    if os.environ.get("DEV_ENV") == "LOCAL":
+        redirect_uri = "http%3A%2F%2F127.0.0.1%3A5000%2Fhub" #Hint: https://www.urlencoder.org/
+    else:
+        redirect_uri = "https%3A%2F%2Fplaylists-for-cats.herokuapp.com%2Fhub" #Hint: https://www.urlencoder.org/
     state = str(uuid.uuid4().hex)
     scope = "user-library-read user-read-email playlist-modify-private playlist-modify-public"
     show_dialog = False
@@ -22,11 +25,18 @@ class SpotifyUser:
     # Method to get first auth token
     def get_first_token(self, auth_code):
         # Request variables
-        payload = {
-            "grant_type": "authorization_code",
-            "code": auth_code,
-            "redirect_uri": "http://127.0.0.1:5000/hub"
-        }
+        if os.environ.get("DEV_ENV") == "LOCAL":
+            payload = {
+                "grant_type": "authorization_code",
+                "code": auth_code,
+                "redirect_uri": "http://127.0.0.1:5000/hub"
+            }
+        else:
+            payload = {
+                "grant_type": "authorization_code",
+                "code": auth_code,
+                "redirect_uri": "https://playlists-for-cats.herokuapp.com/hub"
+            }
         # Make request to get first token
         token = requests.post("https://accounts.spotify.com/api/token", data=payload, headers=self.header)
         # Parse request content
