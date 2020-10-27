@@ -3,7 +3,7 @@
 
 # Relevant modules/packages from package
 from spotapp import app, db, session
-from spotapp.db import Users
+from spotapp.db import users
 from spotapp.classes import SpotifyUser
 
 # Relevant modules/packages from pip
@@ -62,7 +62,7 @@ def hub():
 
     # Check if the user is already in the DB
     try:
-        query_email = Users.query.filter(Users.email == user_email).first().email
+        query_email = users.query.filter(users.email == user_email).first().email
     except:
         query_email = "NA"
 
@@ -72,7 +72,7 @@ def hub():
     else:
         returning_user = False
         datetimenow_format = str(datetime.utcnow()).replace(" ", "-").replace(":", "-").replace(".", "-")
-        db.session.add(Users(email = user_email, created_on = str(datetimenow_format)))
+        db.session.add(users(email = user_email, created_on = str(datetimenow_format)))
         db.session.commit()
 
     # Return template for that user

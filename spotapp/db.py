@@ -5,7 +5,7 @@
 from spotapp import db
 
 # Create DB model for Users Table
-class Users(db.Model):
+class users(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     email = db.Column(db.String(255), index = True, unique = True)
     created_on = db.Column(db.String(50), index = True, unique = False)
