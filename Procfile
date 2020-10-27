@@ -1,1 +1,1 @@
-web: gunicorn spotapp:app
+web: gunicorn spotapp:app --timeout 120 --workers=3 --threads=3
