@@ -1,1 +1,1 @@
-web: gunicorn spotapp:app
+web: gunicorn setup:app
