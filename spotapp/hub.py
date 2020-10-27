@@ -18,6 +18,9 @@ def index():
     visit = SpotifyUser()
     # Clear token in session
     session.pop("original_refresh_token", None)
+    # Store state for verifications purposes
+    session.pop("state", None)
+    session["state"] = visit.state
     # Return template for that user
     return render_template("index.html", auth=visit.auth)
 
@@ -37,7 +40,7 @@ def hub():
         code = request.args.get("code", default=None)
         state = request.args.get("state", default=None)
         # Make sure the state is the same as the one set in the visit class
-        if state == visit.state:
+        if state == session["state"]:
             # Generate auth token for this code
             token = visit.get_first_token(code)
             # Store token in session
