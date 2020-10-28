@@ -36,13 +36,14 @@ def hub():
         cluster_num = "NA"
     # OAuth flow
     try:
-        # Get connection arguments
+        # Get connection code arguments
         code = request.args.get("code", default=None)
+        # Generate auth token for this code
+        token = visit.get_first_token(code)
+        # Get connection state arguments
         state = request.args.get("state", default=None)
         # Make sure the state is the same as the one set in the visit class
         if state == session["state"]:
-            # Generate auth token for this code
-            token = visit.get_first_token(code)
             # Store token in session
             session["original_refresh_token"] = token
             # Get a new refreshed token
