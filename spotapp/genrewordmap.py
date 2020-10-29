@@ -2,7 +2,7 @@
 # Goal: Create routes for genre word map page
 
 # Relevant modules/packages from package
-from spotapp import app
+from spotapp import app, celery
 from spotapp.classes import SpotifyUser
 
 # Relevant modules/packages from pip
@@ -17,6 +17,13 @@ import os
 from datetime import datetime
 import pandas as pd
 
+# Test Celery
+import time
+@celery.task()
+def add_together(a, b):
+    time.sleep(5)
+    return a + b
+
 # Define genre wordmap route
 @app.route("/hub/genrewordmap", methods=["GET","POST"])
 def genrewordmap():
@@ -24,7 +31,7 @@ def genrewordmap():
     visit = SpotifyUser()
     #Get a new refreshed token
     refresh_token = visit.get_refresh_token(session["original_refresh_token"])
-
+    '''
     # Get number of clusters from session (this is used to generate the nav items)
     try:
         cluster_num = session["cluster_number"]
@@ -37,10 +44,10 @@ def genrewordmap():
     try:
         track_url = user_saved_tracks["next"]
     except:
-        track_url = "https://api.spotify.com/v1/me/tracks?limit=50"
+        track_url = "https://api.spotify.com/v1/me/tracks?limit=5"
 
     # Update while loop here when we are ready to run code for everysong - without iteration block
-    while track_url != None and iteration <= 20:
+    while track_url != None and iteration <= 2:
         try:
             r = visit.make_an_api_call(track_url, {"Authorization": "Bearer " + refresh_token})
             # Parse Response
@@ -104,7 +111,12 @@ def genrewordmap():
     
     # Transform into dictionary to pass to the template
     genres_count_dic = genres_count.to_dict("index")
+    '''
+    # Test Celery
+    result = add_together.delay(1, 1)
 
     # Return template for that user
-    return render_template("genrewordmap.html", display_image_path=display_image_path, genres_count_dic=genres_count_dic, genres_count_sum=genres_count_sum, cluster_num=cluster_num)
+    #return render_template("genrewordmap.html", display_image_path=display_image_path, genres_count_dic=genres_count_dic, genres_count_sum=genres_count_sum, cluster_num=cluster_num,\
+    #    result=result)
+    return render_template("genrewordmap.html")
     

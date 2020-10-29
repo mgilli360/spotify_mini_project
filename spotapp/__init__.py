@@ -29,6 +29,16 @@ app.config["SESSION_SQLALCHEMY_TABLE"] = "sessions"
 app.config["SESSION_SQLALCHEMY"] = db
 Session(app)
 
+# Configure Celery app
+## run this to start celery : celery -A spotapp.celery worker --pool=gevent --loglevel=INFO
+## run this to purge all pending tasks: celery -A spotapp.celery purge
+app.config["CELERY_BROKER_URL"] = "amqp://local:devCELERY8@localhost:5672/myvhost"
+app.config["CELERY_BACKEND"] = "rpc://"
+
+# Initiate celery app
+from spotapp.flask_celery import make_celery
+celery = make_celery(app)
+
 # Import flask app routes
 import spotapp.hub
 import spotapp.genrewordmap
