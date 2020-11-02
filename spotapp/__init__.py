@@ -32,8 +32,8 @@ Session(app)
 # Configure Celery app
 ## run this to start celery : celery -A spotapp.celery worker --pool=gevent --loglevel=INFO
 ## run this to purge all pending tasks: celery -A spotapp.celery purge
-app.config["CELERY_BROKER_URL"] = "amqp://local:devCELERY8@localhost:5672/myvhost"
-app.config["CELERY_BACKEND"] = "rpc://"
+app.config["CELERY_BROKER_URL"] = os.environ.get("CELERY_BROKER_URL")
+app.config["CELERY_BACKEND"] = os.environ.get("CELERY_BACKEND")
 
 # Initiate celery app
 from spotapp.flask_celery import make_celery

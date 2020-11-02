@@ -17,7 +17,7 @@ class SpotifyUser:
         redirect_uri = "https%3A%2F%2Fplaylists-for-cats.herokuapp.com%2Fhub" #Hint: https://www.urlencoder.org/
     state = str(uuid.uuid4().hex)
     scope = "user-library-read user-read-email playlist-modify-private playlist-modify-public"
-    show_dialog = False
+    show_dialog = True
     auth = f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&state={state}&scope={scope}&show_dialog={show_dialog}"
     client_id_and_secret = os.environ.get("SPOTIFY_CLIENT_SECRET_KEY") # Base64URL format
     header = {"Authorization": f"Basic {client_id_and_secret}"}

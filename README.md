@@ -1,4 +1,4 @@
-# Spotify Mini Project
+# Spotify Playlist Generator
 
 This project was created for fun to explore the [Spotify API](https://developer.spotify.com/).
 

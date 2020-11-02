@@ -2,7 +2,7 @@
 {%block title_content%}Wordmap{%endblock%}
 {%block header_content%}
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-        <h5 class="my-0 mr-md-auto font-weight-normal">Spotify Mini Project</h5>
+        <h5 class="my-0 mr-md-auto font-weight-normal">Spotify Playlist Generator</h5>
         <nav class="my-2 my-md-0 mr-md-3">
             <ul class="nav">
                 <li class="nav-item">
@@ -32,11 +32,12 @@
             </div>
         </div>
     </div>
+    {% if genres_count_sum != "NA" %}
     <div class="container my-4">
         <div class="row">
             <div class="col">
                 <p>
-                    Wordmap built using the genres of music in your saved songs library. The algorithm can process up to <b>1000</b> songs.<br><br>
+                    Wordmap built using the genres of music in your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
                     The size of the words will depend on the frequency of them appearing in your library. The more you listen to a genre, the bigger the genre's name will appear in the wordmap.<br><br>
                     <small>
                         Wordmap generated using the python <a href="https://pypi.org/project/wordcloud/">wordcloud library</a>.
@@ -75,4 +76,23 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="container my-4">
+        <div class="row">
+            <div class="col">
+                <p>
+                    The wordmap takes between 1 and 5 minutes to generate, depending on how many songs are used to create the image.<br><br>
+                    <b>Return to or refresh this page in about 1 to 5 minutes to see the results!!!</b>
+                </p>
+                <p>
+                    Wordmap will be built using the genres of music in your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
+                    The size of the words will depend on the frequency of them appearing in your library. The more you listen to a genre, the bigger the genre's name will appear in the wordmap.<br><br>
+                    <small>
+                        Wordmap generated using the python <a href="https://pypi.org/project/wordcloud/">wordcloud library</a>.
+                    </small>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {%endblock%}
