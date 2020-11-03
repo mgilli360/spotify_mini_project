@@ -1,5 +1,5 @@
 # Created by: Mathieu Gilli
-# Goal: Create playlist in spotify
+# Goal: Create playlist in spotify for clusters
 
 # Relevant modules/packages from package
 from spotapp import app
@@ -10,9 +10,9 @@ from flask import redirect, session, url_for
 import pandas as pd
 import math
 
-# Define track cluster route
+# Define track cluster route for creating playlists
 @app.route("/hub/trackcluster/result/<int:num>", methods=["GET","POST"])
-def createplaylist(num):
+def createplaylistcluster(num):
     # Instantiate a spotify user
     visit = SpotifyUser()
     #Get a new refreshed token
@@ -27,9 +27,23 @@ def createplaylist(num):
     # Filter on Cluster Selected
     cluster_result = cluster_result[cluster_result.cluster == num]
 
+    # Get describe table results from session
+    cluster_result_describe_dic = session["cluster_describe_result"]
+    cluster_result_describe = pd.DataFrame(cluster_result_describe_dic)
+    # Filter on Cluster Selected
+    cluster_result_describe = cluster_result_describe[cluster_result_describe.cluster == num]
+    cluster_result_describe = cluster_result_describe[cluster_result_describe.stat == "mean"]
+    # Convert to index dic
+    cluster_result_describe = cluster_result_describe.to_dict("index")
+    # Print output into sentence
+    output = "Cluster results -> | "
+    for values in cluster_result_describe.values():
+        for key, value in values.items():
+            output += str(key) + ": " + str(value) + " | " 
+
     # Create playlist for cluster
     h = {"Content-Type":"application/json", "Authorization":"Bearer " + str(refresh_token)}
-    playlist_id = visit.create_playlist(h, session["user_id"], "Cluster " + str(num))
+    playlist_id = visit.create_playlist(h, session["user_id"], "Cluster " + str(num), str(output))
     
     # Get songs URIs
     cluster_uri_list = cluster_result.uri.unique().tolist()

@@ -26,7 +26,7 @@ def trackclusterresult():
     cluster_result = pd.DataFrame(cluster_result_dic)
 
     # Return results to html - change order
-    cluster_result_html = cluster_result[["cluster", "name", "acousticness", "danceability", "energy", "instrumentalness", "liveness", "loudness", "mode", "speechiness", "tempo", "valence"]]
+    cluster_result_html = cluster_result[["cluster", "name", "acousticness", "danceability", "energy", "instrumentalness", "liveness", "loudness", "speechiness", "tempo", "valence"]]
     ## add 1 to cluster
     cluster_result_html = cluster_result_html.copy()
     cluster_result_html.cluster = cluster_result_html.cluster + 1
@@ -40,7 +40,7 @@ def trackclusterresult():
     cluster_result_dic = cluster_result_html_format.to_dict("index")
 
     # Describe table after clustering
-    model_columns = ["acousticness", "danceability", "energy", "instrumentalness", "liveness", "loudness", "mode", "speechiness", "tempo", "valence"]
+    model_columns = ["acousticness", "danceability", "energy", "instrumentalness", "liveness", "loudness", "speechiness", "tempo", "valence"]
     unique_clusters = cluster_result_html.cluster.unique().tolist()
     unique_clusters.sort()
     describe_table = pd.DataFrame()
@@ -51,14 +51,19 @@ def trackclusterresult():
             temp_describe_table["cluster"] = cluster
             temp_describe_table[column] = cluster_df[column].describe().round(decimals=2).apply(lambda x: str("{:.2f}".format(round(x, 2))).rstrip('0').rstrip('.'))
         describe_table = describe_table.append(temp_describe_table)
-    
+     
     #Render pandas descriptive table to html for webpage
     ## convert to dic
     describe_table = describe_table.reset_index()    
-    describe_table.columns = ["","cluster", "acousticness", "danceability", "energy", "instrumentalness", "liveness", "loudness", "mode", "speechiness", "tempo", "valence"]
+    describe_table.columns = ["stat","cluster", "acousticness", "danceability", "energy", "instrumentalness", "liveness", "loudness", "speechiness", "tempo", "valence"]
     describe_table_dic_html = describe_table.to_dict("index")
     ## save column names
     describe_table_columns = describe_table.columns.values.tolist()
+
+    # Save describe table results to session
+    session.pop("cluster_describe_result", None)
+    cluster_describe_result_session = describe_table.to_dict("list")
+    session["cluster_describe_result"] = cluster_describe_result_session
     
     # Return template for that user
     return render_template("trackclusterresult.html", cluster_result_dic=cluster_result_dic, cluster_num=cluster_num, cluster_result_html_columns=cluster_result_html_columns,\

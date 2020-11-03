@@ -64,12 +64,12 @@ class SpotifyUser:
         return r
     
     # Method to get refresh auth token
-    def create_playlist(self, h, user_id, name):
+    def create_playlist(self, h, user_id, name, desc=""):
         # Request variables
         payload = {
             "name": name,
             "public": False,
-            "description": "Playlist created from Spotify Mini App - Enjoy!"
+            "description": "Playlist created from Spotify Playlist Generator - Enjoy! " + desc
         }
         # Make request to get refresh token
         token = requests.post(url="https://api.spotify.com/v1/users/" + str(user_id) + "/playlists", data=json.dumps(payload), headers=h)

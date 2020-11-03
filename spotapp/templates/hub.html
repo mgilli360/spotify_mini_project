@@ -13,9 +13,11 @@
                     <a class="nav-link" href="/hub/genrewordmap">Genres Wordmap</a>
                 </li>
                 {% endif %}
+                {% if celery_task_cluster_id != "NA" %}
                 <li class="nav-item">
                     <a class="nav-link" href="/hub/trackcluster">Track Clusters</a>
                 </li>
+                {% endif %}
                 {% if cluster_num != "NA" %}
                 <li class="nav-item">
                     <a class="nav-link" href="/hub/trackcluster/result">Track Clusters Results</a>
@@ -71,12 +73,19 @@
                         <h5 class="card-title">Genres Wordmap</h5>
                         <p class="card-text">
                             Generate a wordmap using the genres of music in your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
+                            Create playlists for the genres you want to explore!<br><br>
                             The font-size of the words will depend on the frequency of them appearing in your library. The more you listen to a genre, the bigger the genre's name will appear in the wordmap.<br><br>
                             <small>
                                 Wordmaps use the python <a href="https://pypi.org/project/wordcloud/">wordcloud library</a>
                             </small>
                         </p>
-                        <a href="/hub/genrewordmap/create" class="btn btn-primary mt-auto">Generate</a>
+                        <a href="/hub/genrewordmap/create" class="btn btn-primary mt-auto">
+                            {% if celery_task_genre_id == "NA" %}
+                                Generate
+                            {% else %}
+                                Re-Generate
+                            {% endif %}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -86,14 +95,21 @@
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Track Clusters</h5>
                         <p class="card-text">
-                            Generate homogeneous clusters of tracks from your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
+                            Generate clusters of tracks from your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
+                            Create playlists for the clusters you enjoy!<br><br>
                             The number of clusters is chosen by you. The application will provide the inertia per number of clusters to help you choose (inertia is a measure of how internally coherent clusters are, thus  the lower the better).<br><br>
-                            The clusters are based on songs' <i>acousticness</i>, <i>danceability</i>, <i>energy</i>, <i>instrumentalness</i>, <i>liveness</i>, <i>loudness</i>, <i>mode</i>, <i>speechiness</i>, <i>tempo</i> and <i>valence</i>. The definition for each can be found <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/">here</a>.<br><br>
+                            The clusters are based on songs' <i>acousticness</i>, <i>danceability</i>, <i>energy</i>, <i>instrumentalness</i>, <i>liveness</i>, <i>loudness</i>, <i>speechiness</i>, <i>tempo</i> and <i>valence</i>. The definition for each can be found <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/">here</a>.<br><br>
                             <small>
                                 Clusters use the python <a href="https://scikit-learn.org/">scikit-learn library</a>
                             </small>
                         </p>
-                        <a href="/hub/trackcluster" class="btn btn-primary mt-auto">Generate</a>
+                        <a href="/hub/trackcluster/create" class="btn btn-primary mt-auto">
+                            {% if celery_task_cluster_id == "NA" %}
+                                Generate
+                            {% else %}
+                                Re-Generate
+                            {% endif %}
+                        </a>
                     </div>
                 </div>
             </div>

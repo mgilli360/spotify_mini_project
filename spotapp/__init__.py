@@ -44,4 +44,5 @@ import spotapp.hub
 import spotapp.genrewordmap
 import spotapp.trackcluster
 import spotapp.trackclusterresult
-import spotapp.createplaylist
+import spotapp.createplaylistcluster
+import spotapp.createplaylistgenre

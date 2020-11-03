@@ -8,9 +8,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/hub">Hub</a>
                 </li>
+                {% if celery_task_genre_id != "NA" %}
                 <li class="nav-item">
                     <a class="nav-link" href="/hub/genrewordmap">Genres Wordmap</a>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                     <a class="nav-link font-weight-bold" href="/hub/trackcluster">Track Clusters</a>
                 </li>
@@ -32,13 +34,14 @@
             </div>
         </div>
     </div>
+    {% if display_image_path != "NA" %}
     <div class="container mt-5 mb-3">
         <div class="row">
             <div class="col-6">
                 <p class="card-text">
-                    Generate homogeneous clusters of tracks from your saved songs library. The algorithm will process up to <b>1000</b> songs.<br><br>
+                    Generate homogeneous clusters of tracks from your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
                     The number of clusters is chosen by you. The image on the left provides the <b>inertia</b> per number of clusters to help you choose (inertia is a measure of how internally coherent clusters are, thus  the lower the better).<br><br>
-                    The clusters are based on songs' <i>acousticness</i>, <i>danceability</i>, <i>energy</i>, <i>instrumentalness</i>, <i>liveness</i>, <i>loudness</i>, <i>mode</i>, <i>speechiness</i>, <i>tempo</i> and <i>valence</i>. The definition for each can be found <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/">here</a>.<br><br>
+                    The clusters are based on songs' <i>acousticness</i>, <i>danceability</i>, <i>energy</i>, <i>instrumentalness</i>, <i>liveness</i>, <i>loudness</i>, <i>speechiness</i>, <i>tempo</i> and <i>valence</i>. The definition for each can be found <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/">here</a>.<br><br>
                     <small>
                         Clusters use the python <a href="https://scikit-learn.org/">scikit-learn library</a>
                     </small>
@@ -114,4 +117,24 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="container my-4">
+        <div class="row">
+            <div class="col">
+                <p>
+                    The clusters take between 1 and 5 minutes to generate, depending on how many songs are used to create the image.<br><br>
+                    <b>Return to or refresh this page in about 1 to 5 minutes to see the results!!!</b>
+                </p>
+                <p>
+                    The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
+                    The clusters are based on songs' <i>acousticness</i>, <i>danceability</i>, <i>energy</i>, <i>instrumentalness</i>, <i>liveness</i>, <i>loudness</i>, <i>speechiness</i>, <i>tempo</i> and <i>valence</i>. The definition for each can be found <a href="https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/">here</a>.<br><br>
+                    <small>
+                        Clusters use the python <a href="https://scikit-learn.org/">scikit-learn library</a>
+                    </small>
+                    <br><br>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {%endblock%}

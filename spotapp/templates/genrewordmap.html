@@ -11,9 +11,11 @@
                 <li class="nav-item">
                     <a class="nav-link font-weight-bold" href="/hub/genrewordmap">Genres Wordmap</a>
                 </li>
+                {% if celery_task_cluster_id != "NA" %}
                 <li class="nav-item">
                     <a class="nav-link" href="/hub/trackcluster">Track Clusters</a>
                 </li>
+                {% endif %}
                 {% if cluster_num != "NA" %}
                 <li class="nav-item">
                     <a class="nav-link" href="/hub/trackcluster/result">Track Clusters Results</a>
@@ -57,20 +59,23 @@
                 <table class="table table-striped table-hover py-5">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
+                            <th scope="col">Genre</th>
                             <th scope="col">Count</th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for index, value in genres_count_dic.items() %}
+                        {% for value in genres_count_dic.values() %}
                         <tr>
-                            <th scope="row">{{ index }}</th>
+                            <th scope="row">{{ value["genre"] }}</th>
                             <td>{{ value["count"] }}</td>
+                            <td><a href="/hub/genrewordmap/{{ value['genre_url'] }}"><button type="button" class="btn btn-outline-success" id="connect">Create</button></a></td>
                         </tr>
                         {% endfor %}
                         <tr>
-                            <td class="bg-dark text-white"><b>Sum</b></td>
+                            <td class="bg-dark text-white"><b>Total Count</b></td>
                             <td class="bg-dark text-white"><b>{{ genres_count_sum }}</b></td>
+                            <td class="bg-dark text-white"></td>
                         </tr>
                   </table>
             </div>

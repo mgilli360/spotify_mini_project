@@ -57,6 +57,11 @@ def hub():
         celery_task_genre_id = session["celery_task_genre_id"]
     except:
         celery_task_genre_id = "NA"
+    # Get celery_task_cluster_id of cluster from session (this is used to generate the nav items)
+    try:
+        celery_task_cluster_id = session["celery_task_cluster_id"]
+    except:
+        celery_task_cluster_id = "NA"
     
     # OAuth flow
     try:
@@ -109,13 +114,11 @@ def hub():
         session.pop("nb_songs_query", None)
         # Get n from form
         n = n_form.n.data
-        print(n)
         # Save results to session
         session["nb_songs_query"] = int(n)
-        print(session["nb_songs_query"])
         # Redirect to cluster result
         return redirect(url_for("hub", _external=True))
 
     # Return template for that user
     return render_template("hub.html", user_email=user_email, returning_user=returning_user, cluster_num=cluster_num, celery_task_genre_id=celery_task_genre_id,\
-        template_form=n_form, n=n)
+        template_form=n_form, n=n, celery_task_cluster_id=celery_task_cluster_id)

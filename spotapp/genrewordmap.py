@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 import os
 from datetime import datetime
 import pandas as pd
+import urllib.parse
 
 # Create celery task to generate the wordmap
 @celery.task(name="create_wordmap")
@@ -39,18 +40,20 @@ def create_wordmap(refresh_token, n):
             user_saved_tracks = json.loads(r.content)
             # Save artist url in list
             for i in user_saved_tracks["items"]:
+                song_uri = i["track"]["uri"]
                 for i2 in i["track"]["artists"]:
                     for i3, i4 in i2.items():
                         if i3 == 'href':
-                            artists_to_query.append(i4)
+                            artists_to_query.append([song_uri, i4])
                             track_url = user_saved_tracks["next"]
         except:
             continue
         iteration += 1
     
     # Make a request to get users saved tracks related ARTIST
+    genres_uri = []
     genres = []
-    for artist in artists_to_query:
+    for song_uri, artist in artists_to_query:
         # Make api call to get artist data
         try:
             r = visit.make_an_api_call(artist, {"Authorization": "Bearer " + refresh_token})
@@ -58,10 +61,11 @@ def create_wordmap(refresh_token, n):
             user_saved_artists = json.loads(r.content)
             # Add genres of queried song to list of genres to analyse
             for i in user_saved_artists.get("genres", "NA"):
+                genres_uri.append([song_uri, i])
                 genres.append(i)
         except:
             continue
-
+    
     # Generate wordmap, first Update stopwords:
     stopwords = set(STOPWORDS)
     stopwords.update(["NA"])
@@ -88,6 +92,9 @@ def create_wordmap(refresh_token, n):
     # Generate table with count of genres
     df_genres = pd.DataFrame(genres, columns = ["genre"])
     genres_count = df_genres.genre.value_counts().to_frame("count")
+    genres_count = genres_count.reset_index() 
+    genres_count.columns = ["genre", "count"]
+    genres_count["genre_url"] = genres_count["genre"].apply(lambda x : urllib.parse.quote(x)).astype(str)
     
     # Transform into dictionary to pass to the template
     genres_count_dic = genres_count.to_dict("index")
@@ -99,7 +106,8 @@ def create_wordmap(refresh_token, n):
     result = {
         "display_image_path": display_image_path,
         "genres_count_dic": genres_count_dic,
-        "genres_count_sum": int(genres_count_sum)
+        "genres_count_sum": int(genres_count_sum),
+        "genres_uri": genres_uri
     }
     result_json = json.dumps(result)
     
@@ -108,7 +116,6 @@ def create_wordmap(refresh_token, n):
 # Define genre wordmap CREATION route
 @app.route("/hub/genrewordmap/create", methods=["GET","POST"])
 def genrewordmapcreate():
-    # Clear the genre wordmap session result id
     session.pop("celery_task_genre_id", None)
 
     # Check if a new default nb_songs_query is set, if so use it. Else use the default of 1000
@@ -138,7 +145,11 @@ def genrewordmap():
         cluster_num = session["cluster_number"]
     except:
         cluster_num = "NA"
-    
+    # Get celery_task_cluster_id of cluster from session (this is used to generate the nav items)
+    try:
+        celery_task_cluster_id = session["celery_task_cluster_id"]
+    except:
+        celery_task_cluster_id = "NA"
     # Check if a new default nb_songs_query is set, if so use it. Else use the default of 1000
     try:
         n = session["nb_songs_query"]
@@ -147,26 +158,43 @@ def genrewordmap():
 
     # celery_task_genre_id from session
     task_id = session["celery_task_genre_id"]
-
     # Get genres_count_sum, genres_count_dic and display_image_path of wordmap from celery_task
     try:
         # Getting the celery_task results
         res = celery.AsyncResult(task_id)
-        # Getting the celery_task status, if True: set the variables to tasks results
+        # Getting the celery_task status, if True: set the session + variables to tasks results
         if res.ready():
+            # Set function variables ---> genres_uri
             result_json = json.loads(res.get())
             display_image_path = result_json["display_image_path"]
             genres_count_dic = result_json["genres_count_dic"]
             genres_count_sum = result_json["genres_count_sum"]
-        else:
-            raise Exception("Celery task not completed yet.")
+            genres_uri = result_json["genres_uri"]
+            # Clear session variables
+            session.pop("display_image_path", None)
+            session.pop("genres_count_dic", None)
+            session.pop("genres_count_sum", None)
+            session.pop("genres_uri", None)
+            # Set session variables
+            session["display_image_path"] = display_image_path
+            session["genres_count_dic"] = genres_count_dic
+            session["genres_count_sum"] = genres_count_sum
+            session["genres_uri"] = list(genres_uri)
+        # If unsuccessful use session
+        else: 
+            display_image_path = session["display_image_path"]
+            genres_count_dic = session["genres_count_dic"]
+            genres_count_sum = session["genres_count_sum"]
+            genres_uri = session["genres_uri"]    
+    # If unsuccessful set the variables to "NA"
     except:
-        # If unsuccessful, set the variables to "NA"
-        genres_count_sum = "NA"
-        genres_count_dic = "NA"
         display_image_path = "NA"
+        genres_count_dic = "NA"
+        genres_count_sum = "NA"
+        genres_uri = "NA"
+
     
     # Return template for that user
     return render_template("genrewordmap.html", cluster_num=cluster_num, display_image_path=display_image_path, genres_count_dic=genres_count_dic,\
-        genres_count_sum=genres_count_sum, n=n)
-    
+        genres_count_sum=genres_count_sum, n=n, celery_task_cluster_id=celery_task_cluster_id)
+        
