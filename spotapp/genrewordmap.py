@@ -116,6 +116,7 @@ def create_wordmap(refresh_token, n):
 # Define genre wordmap CREATION route
 @app.route("/hub/genrewordmap/create", methods=["GET","POST"])
 def genrewordmapcreate():
+    # Remove celery task inside session
     session.pop("celery_task_genre_id", None)
 
     # Check if a new default nb_songs_query is set, if so use it. Else use the default of 1000
@@ -162,9 +163,13 @@ def genrewordmap():
     try:
         # Getting the celery_task results
         res = celery.AsyncResult(task_id)
+
+        # Test 
+        print(res.status)
+
         # Getting the celery_task status, if True: set the session + variables to tasks results
         if res.ready():
-            # Set function variables ---> genres_uri
+            # Set function variables
             result_json = json.loads(res.get())
             display_image_path = result_json["display_image_path"]
             genres_count_dic = result_json["genres_count_dic"]
@@ -180,6 +185,12 @@ def genrewordmap():
             session["genres_count_dic"] = genres_count_dic
             session["genres_count_sum"] = genres_count_sum
             session["genres_uri"] = list(genres_uri)
+        # If new task was started
+        elif res.status == "STARTED":
+            display_image_path = "NA"
+            genres_count_dic = "NA"
+            genres_count_sum = "NA"
+            genres_uri = "NA"
         # If unsuccessful use session
         else: 
             display_image_path = session["display_image_path"]

@@ -34,6 +34,7 @@ Session(app)
 ## run this to purge all pending tasks: celery -A spotapp.celery purge
 app.config["CELERY_BROKER_URL"] = os.environ.get("CELERY_BROKER_URL")
 app.config["CELERY_BACKEND"] = os.environ.get("CELERY_BACKEND")
+app.config["task_track_started"] = True
 
 # Initiate celery app
 from spotapp.flask_celery import make_celery

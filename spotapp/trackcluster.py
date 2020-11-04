@@ -191,6 +191,10 @@ def trackcluster():
     try:
         # Getting the celery_task results
         res = celery.AsyncResult(task_id)
+
+        # Test 
+        print(res.status)
+
         # Getting the celery_task status, if True: set the session + variables to tasks results
         if res.ready():
             # Set function variables
@@ -218,6 +222,15 @@ def trackcluster():
             session["describe_table_dic"] = describe_table_dic
             session["json_audio_features"] = json_audio_features
             session["json_normalized_table"] = json_normalized_table
+        # If new task was started
+        elif res.status == "STARTED":
+            audio_features_html_columns = "NA"
+            audio_features_html_format_dic = "NA"
+            display_image_path_cluster = "NA"
+            describe_table_columns = "NA"
+            describe_table_dic = "NA"
+            json_audio_features = "NA"
+            json_normalized_table = "NA"
         # If unsuccessful, use session
         else:
             audio_features_html_columns = session["audio_features_html_columns"]

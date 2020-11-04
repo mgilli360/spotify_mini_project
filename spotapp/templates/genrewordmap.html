@@ -73,8 +73,8 @@
                         </tr>
                         {% endfor %}
                         <tr>
-                            <td class="bg-dark text-white"><b>Total Count</b></td>
-                            <td class="bg-dark text-white"><b>{{ genres_count_sum }}</b></td>
+                            <td class="bg-dark text-white"><b>Total: {{ genres_count_sum }} genres</b></td>
+                            <td class="bg-dark text-white"></td>
                             <td class="bg-dark text-white"></td>
                         </tr>
                   </table>
@@ -87,7 +87,7 @@
             <div class="col">
                 <p>
                     The wordmap takes between 1 and 5 minutes to generate, depending on how many songs are used to create the image.<br><br>
-                    <b>Return to or refresh this page in about 1 to 5 minutes to see the results!!!</b>
+                    <b>Return to or refresh this page in about 1 to 5 minutes to see the results!</b>
                 </p>
                 <p>
                     Wordmap will be built using the genres of music in your saved songs library. The algorithm will process up to <b>{{ n }}</b> songs.<br><br>
