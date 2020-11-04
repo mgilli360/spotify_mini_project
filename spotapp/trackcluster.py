@@ -118,7 +118,12 @@ def create_clusters(refresh_token, n):
     # Save graph
     datetimenow_format = str(datetime.utcnow()).replace(" ", "").replace(":", "").replace(".", "").replace("-", "")
     file_name = "kcluster" + str(datetimenow_format) + ".png"
-    save_image_path = os.path.join("spotapp/static/k_cluster/",file_name)
+
+    if os.environ.get("DEV_ENV") == "LOCAL":
+        save_image_path = os.path.join("spotapp/static/k_cluster/",file_name)
+    else:
+        save_image_path = os.path.join("/spotapp/static/k_cluster/",file_name)
+    
     display_image_path = os.path.join("static/k_cluster/",file_name) 
     plt.savefig(save_image_path)
     plt.close("all")
