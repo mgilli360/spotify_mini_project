@@ -193,8 +193,6 @@ def genrewordmap():
         genres_count_sum = "NA"
         genres_uri = "NA"
 
-    
     # Return template for that user
     return render_template("genrewordmap.html", cluster_num=cluster_num, display_image_path=display_image_path, genres_count_dic=genres_count_dic,\
-        genres_count_sum=genres_count_sum, n=n, celery_task_cluster_id=celery_task_cluster_id)
-        
+        genres_count_sum=genres_count_sum, n=n, celery_task_cluster_id=celery_task_cluster_id)        

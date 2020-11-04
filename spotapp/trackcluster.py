@@ -187,7 +187,7 @@ def trackcluster():
 
     # celery_task_cluster_id from session
     task_id = session["celery_task_cluster_id"]
-    # Get audio_features_html_columns, audio_features_html_format_dic and display_image_path, describe_table_columns, describe_table_dic of clusters from celery_task
+    # Get audio_features_html_columns, audio_features_html_format_dic and display_image_path_cluster, describe_table_columns, describe_table_dic of clusters from celery_task
     try:
         # Getting the celery_task results
         res = celery.AsyncResult(task_id)
@@ -231,7 +231,7 @@ def trackcluster():
         # If unsuccessful, set the variables to "NA"
             audio_features_html_columns = "NA"
             audio_features_html_format_dic = "NA"
-            display_image_path = "NA"
+            display_image_path_cluster = "NA"
             describe_table_columns = "NA"
             describe_table_dic = "NA"
             json_audio_features = "NA"
@@ -268,5 +268,5 @@ def trackcluster():
 
     # Return template for that user
     return render_template("trackcluster.html", audio_features_html_columns=audio_features_html_columns, audio_features_html_format_dic=audio_features_html_format_dic, \
-        display_image_path=display_image_path, template_form=KSelectForm(), describe_table_columns=describe_table_columns, describe_table_dic=describe_table_dic, \
+        display_image_path_cluster=display_image_path_cluster, template_form=KSelectForm(), describe_table_columns=describe_table_columns, describe_table_dic=describe_table_dic, \
         cluster_num=cluster_num, n=n, celery_task_genre_id=celery_task_genre_id)
