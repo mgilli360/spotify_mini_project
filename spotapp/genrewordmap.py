@@ -2,7 +2,7 @@
 # Goal: Create routes for genre word map page
 
 # Relevant modules/packages from package
-from spotapp import app, celery
+from spotapp import app, celery, s3, s3_client
 from spotapp.classes import SpotifyUser
 
 # Relevant modules/packages from pip
@@ -89,6 +89,10 @@ def create_wordmap(refresh_token, n):
     wordcloud.to_file(save_image_path)
     plt.close("all")
 
+    # Upload a new file (send image to S3)
+    data = open(save_image_path, "rb")
+    s3.Bucket("spotify-mini-project-assets").put_object(Key=save_image_path, Body=data)
+
     # Generate table with count of genres
     df_genres = pd.DataFrame(genres, columns = ["genre"])
     genres_count = df_genres.genre.value_counts().to_frame("count")
@@ -105,6 +109,7 @@ def create_wordmap(refresh_token, n):
     # Prepare task result
     result = {
         "display_image_path": display_image_path,
+        "save_image_path": save_image_path,
         "genres_count_dic": genres_count_dic,
         "genres_count_sum": int(genres_count_sum),
         "genres_uri": genres_uri
@@ -164,9 +169,6 @@ def genrewordmap():
         # Getting the celery_task results
         res = celery.AsyncResult(task_id)
 
-        # Test 
-        print(res.status)
-
         # Getting the celery_task status, if True: set the session + variables to tasks results
         if res.ready():
             # Set function variables
@@ -175,35 +177,47 @@ def genrewordmap():
             genres_count_dic = result_json["genres_count_dic"]
             genres_count_sum = result_json["genres_count_sum"]
             genres_uri = result_json["genres_uri"]
+            save_image_path = result_json["save_image_path"]
             # Clear session variables
             session.pop("display_image_path", None)
             session.pop("genres_count_dic", None)
             session.pop("genres_count_sum", None)
             session.pop("genres_uri", None)
+            session.pop("save_image_path", None)
             # Set session variables
             session["display_image_path"] = display_image_path
             session["genres_count_dic"] = genres_count_dic
             session["genres_count_sum"] = genres_count_sum
             session["genres_uri"] = list(genres_uri)
+            session["save_image_path"] = save_image_path
+
+            # Download new results from S3
+            s3_client.download_file("spotify-mini-project-assets", save_image_path, save_image_path)
         # If new task was started
         elif res.status == "STARTED":
             display_image_path = "NA"
             genres_count_dic = "NA"
             genres_count_sum = "NA"
             genres_uri = "NA"
+            save_image_path = "NA"
         # If unsuccessful use session
         else: 
             display_image_path = session["display_image_path"]
             genres_count_dic = session["genres_count_dic"]
             genres_count_sum = session["genres_count_sum"]
             genres_uri = session["genres_uri"]    
+            save_image_path = session["save_image_path"]
+
+            # Download new results from S3
+            s3_client.download_file("spotify-mini-project-assets", save_image_path, save_image_path)
     # If unsuccessful set the variables to "NA"
     except:
         display_image_path = "NA"
         genres_count_dic = "NA"
         genres_count_sum = "NA"
         genres_uri = "NA"
+        save_image_path = "NA"
 
     # Return template for that user
     return render_template("genrewordmap.html", cluster_num=cluster_num, display_image_path=display_image_path, genres_count_dic=genres_count_dic,\
-        genres_count_sum=genres_count_sum, n=n, celery_task_cluster_id=celery_task_cluster_id)        
+        genres_count_sum=genres_count_sum, n=n, celery_task_cluster_id=celery_task_cluster_id)

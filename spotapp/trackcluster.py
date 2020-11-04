@@ -2,7 +2,7 @@
 # Goal: Create routes for generating clusters
 
 # Relevant modules/packages from package
-from spotapp import app, celery
+from spotapp import app, celery, s3, s3_client
 from spotapp.classes import SpotifyUser
 
 # Relevant modules/packages from pip
@@ -123,6 +123,10 @@ def create_clusters(refresh_token, n):
     plt.savefig(save_image_path)
     plt.close("all")
 
+    # Upload a new file (send image to S3)
+    data = open(save_image_path, "rb")
+    s3.Bucket("spotify-mini-project-assets").put_object(Key=save_image_path, Body=data)
+
     # Convert audio_features and normalized_table to dic to pass to json
     json_audio_features = audio_features.to_dict("list")
     json_normalized_table = normalized_table.to_dict("list")
@@ -132,6 +136,7 @@ def create_clusters(refresh_token, n):
         "audio_features_html_columns": audio_features_html_columns,
         "audio_features_html_format_dic": audio_features_html_format_dic,
         "display_image_path": display_image_path,
+        "save_image_path": save_image_path,
         "describe_table_columns": describe_table_columns,
         "describe_table_dic": describe_table_dic,
         "json_audio_features": json_audio_features,
@@ -192,9 +197,6 @@ def trackcluster():
         # Getting the celery_task results
         res = celery.AsyncResult(task_id)
 
-        # Test 
-        print(res.status)
-
         # Getting the celery_task status, if True: set the session + variables to tasks results
         if res.ready():
             # Set function variables
@@ -206,6 +208,7 @@ def trackcluster():
             describe_table_dic = result_json["describe_table_dic"]
             json_audio_features = result_json["json_audio_features"]
             json_normalized_table = result_json["json_normalized_table"]
+            save_image_path_cluster = result_json["save_image_path"]
             # Clear session variables
             session.pop("audio_features_html_columns", None)
             session.pop("audio_features_html_format_dic", None)
@@ -214,6 +217,7 @@ def trackcluster():
             session.pop("describe_table_dic", None)
             session.pop("json_audio_features", None)
             session.pop("json_normalized_table", None)
+            session.pop("save_image_path_cluster", None)
             # Set session variables
             session["audio_features_html_columns"] = audio_features_html_columns
             session["audio_features_html_format_dic"] = audio_features_html_format_dic
@@ -222,6 +226,10 @@ def trackcluster():
             session["describe_table_dic"] = describe_table_dic
             session["json_audio_features"] = json_audio_features
             session["json_normalized_table"] = json_normalized_table
+            session["save_image_path_cluster"] = save_image_path_cluster
+
+            # Download new results from S3
+            s3_client.download_file("spotify-mini-project-assets", save_image_path_cluster, save_image_path_cluster)
         # If new task was started
         elif res.status == "STARTED":
             audio_features_html_columns = "NA"
@@ -231,6 +239,7 @@ def trackcluster():
             describe_table_dic = "NA"
             json_audio_features = "NA"
             json_normalized_table = "NA"
+            save_image_path_cluster = "NA"
         # If unsuccessful, use session
         else:
             audio_features_html_columns = session["audio_features_html_columns"]
@@ -240,6 +249,10 @@ def trackcluster():
             describe_table_dic = session["describe_table_dic"]
             json_audio_features = session["json_audio_features"]
             json_normalized_table = session["json_normalized_table"]
+            save_image_path_cluster = session["save_image_path_cluster"]
+
+            # Download new results from S3
+            s3_client.download_file("spotify-mini-project-assets", save_image_path_cluster, save_image_path_cluster)
     except:
         # If unsuccessful, set the variables to "NA"
             audio_features_html_columns = "NA"
@@ -249,6 +262,7 @@ def trackcluster():
             describe_table_dic = "NA"
             json_audio_features = "NA"
             json_normalized_table = "NA"
+            save_image_path_cluster = "NA"
     
     # Instantiate the form
     k_form = KSelectForm()

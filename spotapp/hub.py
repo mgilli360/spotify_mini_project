@@ -19,11 +19,14 @@ from wtforms.validators import DataRequired
 def index():
     # Instantiate a spotify user
     visit = SpotifyUser()
-    # Clear token in session
+    
+    # Clear session
     session.pop("original_refresh_token", None)
+    
     # Store state for verifications purposes
     session.pop("state", None)
     session["state"] = visit.state
+    
     # Return template for that user
     return render_template("index.html", auth=visit.auth)
 

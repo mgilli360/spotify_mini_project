@@ -7,6 +7,7 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 import uuid
 import os
+import boto3
 
 # Secret Key Generator
 ## import secrets
@@ -18,7 +19,7 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY")
 
 # Initiate DB
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL', "sqlite:///myDB.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///myDB.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
@@ -39,6 +40,10 @@ app.config["task_track_started"] = True
 # Initiate celery app
 from spotapp.flask_celery import make_celery
 celery = make_celery(app)
+
+# Initiate s3 connection
+s3 = boto3.resource("s3")
+s3_client = boto3.client("s3")
 
 # Import flask app routes
 import spotapp.hub
