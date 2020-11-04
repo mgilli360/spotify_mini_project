@@ -84,12 +84,7 @@ def create_wordmap(refresh_token, n):
     # Option 1: Display and save the generated image:
     datetimenow_format = str(datetime.utcnow()).replace(" ", "").replace(":", "").replace(".", "").replace("-", "")
     file_name = "wordmap" + str(datetimenow_format) + ".png"
-
-    if os.environ.get("DEV_ENV") == "LOCAL":
-        save_image_path = os.path.join("spotapp/static/genre_wordmap/",file_name)
-    else:
-        save_image_path = os.path.join("/spotapp/static/genre_wordmap/",file_name)
-    
+    save_image_path = os.path.join("spotapp/static/genre_wordmap/",file_name)
     display_image_path = os.path.join("static/genre_wordmap/",file_name)
     wordcloud.to_file(save_image_path)
     plt.close("all")
