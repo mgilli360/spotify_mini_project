@@ -22,7 +22,12 @@ def index():
     
     # Clear session
     session.pop("original_refresh_token", None)
-    
+    session.pop("cluster_number", None)
+    session.pop("celery_task_cluster_id", None)
+    session.pop("nb_songs_query", None)
+    session.pop("celery_task_genre_id", None)
+    session.pop("genres_count_sum", None)
+    session.pop("display_image_path_cluster", None) 
     # Store state for verifications purposes
     session.pop("state", None)
     session["state"] = visit.state
