@@ -63,7 +63,7 @@ def create_clusters(refresh_token, n):
             # Parse Response
             audio_analysis = json.loads(r.content)
             # Make sure response is not empty
-            if not bool(audio_analysis):
+            if audio_analysis["id"] == id:
                 # Add song_name to result
                 audio_analysis["name"] = name
                 # Update audio_features dataframe
