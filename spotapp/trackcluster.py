@@ -62,10 +62,14 @@ def create_clusters(refresh_token, n):
             r = visit.make_an_api_call("https://api.spotify.com/v1/audio-features/" + id, {"Authorization": "Bearer " + refresh_token})
             # Parse Response
             audio_analysis = json.loads(r.content)
-            # Add song_name to result
-            audio_analysis["name"] = name
-            # Update audio_features dataframe
-            audio_features = audio_features.append(audio_analysis, ignore_index=True)
+            # Make sure response is not empty
+            if not bool(audio_analysis):
+                # Add song_name to result
+                audio_analysis["name"] = name
+                # Update audio_features dataframe
+                audio_features = audio_features.append(audio_analysis, ignore_index=True)
+            else:
+                continue
         except:
             continue
     
